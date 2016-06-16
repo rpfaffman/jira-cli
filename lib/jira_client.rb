@@ -16,7 +16,7 @@ class JiraClient
   end
 
   def query(str)
-    query_str = [base_query, str].compact.join(" and ")
+    query_str = [base_query, str].compact.join(" ")
     request(:get, "search?jql=" + URI.escape(query_str))["issues"]
   end
 
@@ -48,7 +48,9 @@ class JiraClient
     query = []
     query.push(label_query(options[:label])) if options[:label]
     query.push(status_query(options[:status])) if options[:status]
-    query.join(" and ")
+    query_string = query.any? ? "and #{query.join(" and ")}" : ""
+    query_string += order_query(options[:order]) if options[:order]
+    !query_string.empty? ? query_string : nil
   end
 
   def label_query(labels)
@@ -57,6 +59,10 @@ class JiraClient
 
   def status_query(statuses)
     "status in ('#{statuses.join("\', \'")}')"
+  end
+
+  def order_query(field)
+    "order by #{field}"
   end
 
   def base_uri

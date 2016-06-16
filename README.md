@@ -1,9 +1,9 @@
 # Jira CLI
-### Easy way to view JIRA tix and transition their status
+### View/Transition JIRA tix
 
 #### Usage
-* Use JQL directly on command-line - `jira "labels in ('design-tweaks', 'kittens') and status in ('to do')"`
-* Or use flags - `jira -l design-tweaks,kittens -s "to do"`
+* Use JQL directly on command-line - `jira "labels in ('design-tweaks', 'code-review') and status in ('to do')"`
+* Or use flags - `jira -l design-tweaks,code-review -s "to do"`
 * Transition tickets - `jira transition AB-123 -s 'in progress'`
 
 ```
@@ -33,11 +33,12 @@ RESULTS: 3
 
 #### Install
 
-* Clone this repo and cd into it
+* `git clone git@github.com:rpfaffman/jira-cli.git`
+* `cd jira-cli`
 * `bundle install`
-* `chmod +x ./bin/script.rb`
-* `ln -s ~/wherever_you_cloned/jira-cli/bin/script.rb /usr/local/bin/jira`
-* Copy `config.yml.example` to `config.yml` and edit to set up your credentials:
+* `chmod +x ./bin/jira-cli.rb`
+* `ln -s $(pwd)/bin/script.rb /usr/local/bin/jira`
+* Copy `config.yml.example` to `config.yml` and edit:
 
 ```
 EMAIL     : someone@somewhere.com

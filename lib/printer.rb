@@ -22,6 +22,7 @@ class Printer
     print_line
     print "(#{issue['key']}) #{fields['summary']}".brown.underline, " "
     puts "[#{fields['status']['name']}] ".blue
+    puts "#{fields['reporter']['name'].green} assigned to #{fields['assignee']['name'].green}"
     puts "TAGS".underline + ": #{fields['labels'].join(', ').green}"
     puts "DESCRIPTION".underline + ": #{fields['description']}"
     puts "JSON".underline + ": #{issue['self'].cyan}"

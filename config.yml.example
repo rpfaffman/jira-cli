@@ -1,4 +1,4 @@
 EMAIL     : someone@somewhere.com
 PASSWORD  : password123
 JIRA_URI  : https://yourcompany.atlassian.net
-BASE_QUERY: 'assignee="Arthur Dent"'
+BASE_QUERY: "(assignee='Arthur Dent' or issue in watchedissues()) and status not in ('done')"

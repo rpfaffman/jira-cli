@@ -25,7 +25,7 @@ describe JiraClient do
   let(:auth_string) { Base64.encode64("#{email}:#{password}").delete("\n") }
   let(:expected_issues) { ["issue1", "issue2"] }
 
-  describe "#query" do
+  describe "#string_query" do
     let(:full_path) { "#{jira_uri}/rest/api/2/search?jql=#{escaped_query_string}" }
     let(:query_string) { 'labels in ("web")' }
     let(:escaped_query_string) { URI.escape("#{base_query} and #{query_string}") }
@@ -40,7 +40,23 @@ describe JiraClient do
     end
 
     it "should send a GET request with the JQL query" do
-      expect(client.query(query_string)).to eq(expected_issues)
+      expect(client.string_query(query_string)).to eq(expected_issues)
+    end
+
+    describe "query is nil" do
+      let(:escaped_query_string) { URI.escape("#{base_query}") }
+
+      before do
+        allow(api).to receive(:get).with(
+          full_path,
+          headers: headers,
+          body: {}.to_json
+        ) { { "issues" => expected_issues } }
+      end
+
+      it "should send a GET request with base query only" do
+        expect(client.string_query(nil)).to eq(expected_issues)
+      end
     end
   end
 

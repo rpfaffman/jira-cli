@@ -15,6 +15,11 @@ class JiraClient
     query(build_query(options))
   end
 
+  def string_query(string)
+    query_str = base_query && string ? "and #{string}" : string
+    query(query_str)
+  end
+
   def query(str)
     query_str = [base_query, str].compact.join(" ")
     request(:get, "search?jql=" + URI.escape(query_str))["issues"]

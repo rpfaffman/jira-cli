@@ -19,13 +19,23 @@ describe App do
       app.query(options)
     end
 
-    it "should send the options to the client" do
-      expect_any_instance_of(JiraClient)
-        .to receive(:options_query).with(options)
-      app.query(options)
+    describe "query is nil" do
+      it "should use the base query" do
+        expect_any_instance_of(JiraClient)
+          .to receive(:string_query).with(nil)
+        app.query(nil)
+      end
     end
 
-    describe "options arg is a string" do
+    describe "query arg is a hash" do
+      it "should send the options to the client" do
+        expect_any_instance_of(JiraClient)
+          .to receive(:options_query).with(options)
+        app.query(options)
+      end
+    end
+
+    describe "query arg is a string" do
       let(:query_string) { "string" }
 
       before do
@@ -35,7 +45,7 @@ describe App do
 
       it "should send the options to the client" do
         expect_any_instance_of(JiraClient)
-          .to receive(:query).with(query_string)
+          .to receive(:query).with("and #{query_string}")
         app.query(query_string)
       end
     end

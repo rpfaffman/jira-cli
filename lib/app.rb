@@ -4,9 +4,9 @@ require_relative 'printer'
 
 class App
   # query using jql or flags
-  def query(options)
-    query_method = options.is_a?(Hash) ? :options_query : :query
-    issues = client.public_send(query_method, options)
+  def query(query)
+    query_method = query.is_a?(Hash) ? :options_query : :string_query
+    issues = client.public_send(query_method, query)
     printer.display_issues(issues)
   end
 

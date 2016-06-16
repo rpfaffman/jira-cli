@@ -4,11 +4,11 @@ class JiraClient
   attr_reader :jira_uri, :base_query, :email, :password, :api
 
   def initialize(opts)
-    @jira_uri = opts[:jira_uri]
-    @base_query = opts[:base_query]
-    @email = opts[:email]
-    @password = opts[:password]
-    @api = HTTParty
+    @jira_uri = opts.fetch(:jira_uri)
+    @base_query = opts.fetch(:base_query)
+    @email = opts.fetch(:email)
+    @password = opts.fetch(:password)
+    @api = opts.fetch(:api, HTTParty)
   end
 
   def options_query(options)

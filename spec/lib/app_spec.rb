@@ -68,4 +68,14 @@ describe App do
       app.transition(key, options)
     end
   end
+
+  describe "#open" do
+    let(:key) { 'AB-123'}
+
+    it "should open the issue with the client" do
+      expect_any_instance_of(JiraClient)
+        .to receive(:open_issue).with(key)
+      app.open(key)
+    end
+  end
 end

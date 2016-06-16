@@ -11,6 +11,8 @@ class Router
       app.public_send(:update, args[1], options)
     when "transition"
       app.public_send(:transition, args[1], options)
+    when "open"
+      app.public_send(:open, args[1])
     else # default to query
       args = options.any? ? options : args[0]
       app.public_send(:query, args)

@@ -3,15 +3,22 @@ require_relative 'jira_client'
 require_relative 'printer'
 
 class App
+  # query using jql or flags
   def query(options)
     query_method = options.is_a?(Hash) ? :options_query : :query
     issues = client.public_send(query_method, options)
     printer.display_issues(issues)
   end
 
+  # transition state of issue
   def transition(key, options)
     response = client.update_status(key, options[:status].first)
     printer.display_response(response)
+  end
+
+  # open ticket in browser
+  def open(key)
+    client.open_issue(key)
   end
 
   private

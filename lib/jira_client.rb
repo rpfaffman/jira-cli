@@ -20,16 +20,21 @@ class JiraClient
     request(:get, "search?jql=" + URI.escape(query_str))["issues"]
   end
 
-  def update_status(issue_key, status)
-    response = request(:get, "issue/#{issue_key}/transitions")
+  def update_status(key, status)
+    response = request(:get, "issue/#{key}/transitions")
     transition_id = response["transitions"].find do |transition|
       transition["name"].downcase === status.downcase
     end["id"]
     request(
       :post,
-      "issue/#{issue_key}/transitions",
+      "issue/#{key}/transitions",
       transition: { id: transition_id } 
     )
+  end
+
+  def open_issue(key=nil)
+    issue_key = key || `git status | head -n 1 | cut -d ' ' -f 3`.delete("\n")
+    system("open #{jira_uri}/browse/#{issue_key}")
   end
 
   private

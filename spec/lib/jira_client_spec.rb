@@ -96,4 +96,16 @@ describe JiraClient do
       expect(client.update_status(issue_key, status)).to eq(expected_response)
     end
   end
+
+  describe "#open_issue" do
+    let(:issue_key) { 'AB-123' }
+    let(:git_branch_name) { 'XY-987' }
+
+    describe "issue_key is provided" do
+      it "should `open` the jira URI of the provided key" do
+        expect(client).to receive(:system).with("open #{jira_uri}/browse/#{issue_key}")
+        client.open_issue(issue_key)
+      end
+    end
+  end
 end

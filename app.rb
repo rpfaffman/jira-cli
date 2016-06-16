@@ -1,68 +1,74 @@
 #!/usr/bin/env ruby
 
-require 'httparty'
-require 'json'
-require_relative './colors'
 require 'yaml'
+require 'optparse'
 
-class JiraClient
-  attr_reader :api
+require_relative './lib/jira_client'
+require_relative './lib/printer'
 
-  def initialize
-    @api = HTTParty
+class App
+  def query(options)
+    query_method = options.is_a?(Hash) ? :options_query : :query
+    issues = client.public_send(query_method, options)
+    printer.display_issues(issues)
   end
 
-  def query(jql, params={})
-    query_string = base_query + jql
-    response = api.get("#{base_uri}/search?jql=" + + URI.escape(query_string), headers: headers, query: params)
-    print_issues(response["issues"])
-    puts "QUERY: #{query_string}".green
-    puts "RESULTS: #{response["issues"].count}".green
+  def transition(key, options)
+    response = client.update_status(key, options[:status].first)
+    printer.display_response(response)
   end
 
   private
 
-  def print_issues(issues)
-    # use 'tput cols' bash command to get width of screen
-    col_num = `tput cols`
+  def client
+    @client ||= JiraClient.new(
+      jira_uri: config["JIRA_URI"],
+      base_query: config["BASE_QUERY"],
+      email: config["EMAIL"],
+      password: config["PASSWORD"]
+    )
+  end
 
-    issues.each do |issue|
-      fields = issue["fields"]
-      puts "=" * col_num.to_i
-      print "(#{issue['key']}) #{fields['summary']}".brown.underline, " "
-      puts "[#{fields['status']['name']}] ".blue
-      puts "TAGS: #{fields['labels'].join(', ').green}"
-      puts "DESCRIPTION: #{fields['description']}"
-      puts "URI: #{"https://vevowiki.atlassian.net/browse/#{issue['key']}".cyan}"
-    end
-
-    puts "=" * col_num.to_i
+  def printer
+    @printer ||= Printer.new
   end
 
   def config
     @config ||= YAML::load_file(File.join(__dir__, 'config.yml'))
   end
+end
 
-  def headers
-    {
-      "Authorization" => "Basic #{auth_string}",
-      "Content-Type" => "application/json"
-    }
+class Router
+  attr_reader :client
+
+  def initialize(client)
+    @client = client
   end
 
-  def base_query
-    config["BASE_QUERY"]
-  end
-
-  def base_uri
-    "#{config['JIRA_URI']}/rest/api/2"
-  end
-
-  def auth_string
-    @auth_string ||= Base64.encode64("#{config["EMAIL"]}:#{config["PASSWORD"]}").delete("\n")
+  def process(args, options={})
+    case (args[0] && args[0].downcase)
+    when "update"
+      client.public_send(:update, args[1], options)
+    when "transition"
+      client.public_send(:transition, args[1], options)
+    else # default to query
+      args = options.any? ? options : args[0]
+      client.public_send(:query, args)
+    end
   end
 end
 
-JQL = (ARGV.any? ? " and #{ARGV.join(" ")}" : "")
-JiraClient.new.query(JQL)
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: jira [options]"
 
+  opts.on("-s", "--status [status]", Array, "Specify status") do |status|
+    options[:status] = status
+  end
+
+  opts.on("-l", "--label [label]", Array, "Specify label") do |label|
+    options[:label] = label
+  end
+end.parse!
+
+Router.new(App.new).process(ARGV, options)

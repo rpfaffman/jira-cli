@@ -1,14 +1,21 @@
 require_relative './string_colors'
+require_relative './display/issue'
+require_relative './models/issue'
+require 'pry'
 
-class Printer
-  def display_issues(issues)
-    issues.each { |issue| print_issue(issue) }
+class Display
+  def print_issues(issues)
+    (puts "No issues found.".red; return) if issues.to_a.empty?
+    issues.each { |issue|
+      issue_obj = Models::Issue.new(issue)
+      print_issue(issue_obj)
+    }
     print_line
-    puts "RESULTS: #{issues.count}".green
+    puts "Number of issues found: #{issues.count}".green
   end
 
-  def display_response(response)
-    if response.code === 204
+  def print_response(response)
+    if (response.code === 204)
       puts "SUCCESS".green
     else
       puts "ERROR(S): \n".red + "\t" + response["errorMessages"].red.join("\n\t")

@@ -8,14 +8,14 @@ describe App do
   before do
     allow_any_instance_of(JiraClient)
       .to receive(:options_query) { issues }
-    allow_any_instance_of(Printer)
-      .to receive(:display_issues) { true }
+    allow_any_instance_of(Display)
+      .to receive(:print_issues) { true }
   end
 
   describe "#query" do
     it "should print the results" do
-      expect_any_instance_of(Printer)
-        .to receive(:display_issues).with(issues)
+      expect_any_instance_of(Display)
+        .to receive(:print_issues).with(issues)
       app.query(options)
     end
 
@@ -54,28 +54,26 @@ describe App do
   describe "#transition" do
     let(:response) { double('response') }
     let(:key) { 'AB-123' }
-    let(:options) do
-      { status: [ status ] }
-    end
+    let(:args) { [ status ] }
     let(:status) { 'in progress' }
 
     before do
       allow_any_instance_of(JiraClient)
         .to receive(:update_status) { response } 
-      allow_any_instance_of(Printer)
-        .to receive(:display_response) { true }
+      allow_any_instance_of(Display)
+        .to receive(:print_response) { true }
     end
 
     it "should update status" do
       expect_any_instance_of(JiraClient)
         .to receive(:update_status).with(key, status)
-      app.transition(key, options)
+      app.transition(key, args)
     end
 
     it "should print the response" do
-      expect_any_instance_of(Printer)
-        .to receive(:display_response).with(response)
-      app.transition(key, options)
+      expect_any_instance_of(Display)
+        .to receive(:print_response).with(response)
+      app.transition(key, args)
     end
   end
 

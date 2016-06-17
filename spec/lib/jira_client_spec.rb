@@ -63,7 +63,7 @@ describe JiraClient do
   describe "#options_query" do
     let(:options) do
       {
-        label: ['refactor', 'zombies'],
+        labels: ['refactor', 'zombies'],
         status: ['to do']
       }
     end

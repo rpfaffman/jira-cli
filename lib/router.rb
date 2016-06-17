@@ -9,7 +9,8 @@ class Router
     command_str = args[0] && args[0].downcase
 
     if accepted_commands.include?(command_str)
-      app.public_send(args[0], args[1], options)
+      additional_args = options.any? ? options : args[2..-1]
+      app.public_send(args[0], args[1], additional_args)
     else
       app.query(options.any? ? options : args[0])
     end

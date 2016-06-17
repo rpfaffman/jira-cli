@@ -1,23 +1,25 @@
 require 'yaml'
 require_relative 'jira_client'
-require_relative 'printer'
+require_relative 'display'
 
 class App
   # query using jql or flags
+  # TODO: allow query string and options. build query from options
+  # and concatenate the two strings
   def query(query)
     query_method = query.is_a?(Hash) ? :options_query : :string_query
     issues = client.public_send(query_method, query)
-    printer.display_issues(issues)
+    display.print_issues(issues)
   end
 
   # transition state of issue
-  def transition(key, options)
-    response = client.update_status(key, options[:status].first)
-    printer.display_response(response)
+  def transition(key, args)
+    response = client.update_status(key, args.first)
+    display.print_response(response)
   end
 
   # open ticket in browser
-  def open(key)
+  def open(key, options={})
     client.open_issue(key)
   end
 
@@ -32,8 +34,8 @@ class App
     )
   end
 
-  def printer
-    @printer ||= Printer.new
+  def display
+    @display ||= Display.new
   end
 
   def config

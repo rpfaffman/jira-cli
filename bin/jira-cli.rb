@@ -12,8 +12,8 @@ OptionParser.new do |opts|
     options[:assignee] = assignee
   end
 
-  opts.on("-l", "--label [label]", Array, "Specify label") do |label|
-    options[:label] = label
+  opts.on("-l", "--labels [labels]", Array, "Specify labels") do |labels|
+    options[:labels] = labels
   end
 
   opts.on("-s", "--status [status]", Array, "Specify status") do |status|

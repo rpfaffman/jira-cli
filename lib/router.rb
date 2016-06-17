@@ -6,16 +6,22 @@ class Router
   end
 
   def process(args, options={})
-    case (args[0] && args[0].downcase)
-    when "update"
-      app.public_send(:update, args[1], options)
-    when "transition"
-      app.public_send(:transition, args[1], options)
-    when "open"
-      app.public_send(:open, args[1])
-    else # default to query
-      args = options.any? ? options : args[0]
-      app.public_send(:query, args)
+    command_str = args[0] && args[0].downcase
+
+    if accepted_commands.include?(command_str)
+      app.public_send(args[0], args[1], options)
+    else
+      app.query(options.any? ? options : args[0])
     end
+  end
+
+  private
+
+  def accepted_commands
+    [
+      "update",
+      "transition",
+      "open"
+    ]
   end
 end

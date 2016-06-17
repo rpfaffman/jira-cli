@@ -38,7 +38,7 @@ class JiraClient
   end
 
   def open_issue(key=nil)
-    issue_key = key || `git status | head -n 1 | cut -d ' ' -f 3`.delete("\n")
+    issue_key = key || git_branch
     system("open #{jira_uri}/browse/#{issue_key}")
   end
 
@@ -51,23 +51,11 @@ class JiraClient
 
   def build_query(options)
     query = []
-    query.push(label_query(options[:label])) if options[:label]
-    query.push(status_query(options[:status])) if options[:status]
+    order = options.delete(:order)
+    options.each { |k, v| query.push("#{k} in ('#{v.join("\', \'")}')") }
     query_string = query.any? ? "and #{query.join(" and ")}" : ""
-    query_string += order_query(options[:order]) if options[:order]
+    query_string += " order by #{(order)}" if order
     !query_string.empty? ? query_string : nil
-  end
-
-  def label_query(labels)
-    "labels in ('#{labels.join("\', \'")}')"
-  end
-
-  def status_query(statuses)
-    "status in ('#{statuses.join("\', \'")}')"
-  end
-
-  def order_query(field)
-    "order by #{field}"
   end
 
   def base_uri
@@ -87,5 +75,9 @@ class JiraClient
 
   def auth_string
     @auth_string ||= Base64.encode64("#{email}:#{password}").delete("\n")
+  end
+
+  def git_branch
+    `git status | head -n 1 | cut -d ' ' -f 3`.delete("\n")
   end
 end

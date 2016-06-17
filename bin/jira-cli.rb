@@ -8,6 +8,10 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: jira [options]"
 
+  opts.on("-a", "--assignee [assignee]", Array, "Specify assignee") do |assignee|
+    options[:assignee] = assignee
+  end
+
   opts.on("-l", "--label [label]", Array, "Specify label") do |label|
     options[:label] = label
   end

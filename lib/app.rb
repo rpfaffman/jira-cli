@@ -1,6 +1,7 @@
 require 'yaml'
 require_relative 'jira_client'
 require_relative 'display'
+require_relative './models/issue'
 
 class App
   # query using jql or flags
@@ -8,7 +9,7 @@ class App
   # and concatenate the two strings
   def query(query)
     query_method = query.is_a?(Hash) ? :options_query : :string_query
-    issues = client.public_send(query_method, query)
+    issues = client.public_send(query_method, query).map{ |json| Models::Issue.new(json) }
     display.print_issues(issues)
   end
 

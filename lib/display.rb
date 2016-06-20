@@ -6,11 +6,14 @@ require 'pry'
 class Display
   def print_issues(issues)
     (puts "No issues found.".red; return) if issues.to_a.empty?
-    issues.each { |issue|
-      issue_obj = Models::Issue.new(issue)
-      print_issue(issue_obj)
-    }
-    print_line
+
+    print_method = (issues.count > 5) ? :print_abridged : :print_standard
+    issues.each do |issue|
+      print_line if print_method === :print_standard
+      Display::Issue.new(issue).public_send(print_method)
+    end
+
+    print_line if print_method === :print_standard
     puts "Number of issues found: #{issues.count}".green
   end
 
@@ -23,18 +26,6 @@ class Display
   end
 
   private
-
-  def print_issue(issue)
-    fields = issue["fields"]
-    print_line
-    print "(#{issue['key']}) #{fields['summary']}".brown.underline, " "
-    puts "[#{fields['status']['name']}] ".blue
-    puts "#{fields['reporter']['name'].green} assigned to #{fields['assignee']['name'].green}"
-    puts "TAGS".underline + ": #{fields['labels'].join(', ').green}"
-    puts "DESCRIPTION".underline + ": #{fields['description']}"
-    puts "JSON".underline + ": #{issue['self'].cyan}"
-    puts "URI".underline + ": #{"https://vevowiki.atlassian.net/browse/#{issue['key']}".cyan}"
-  end
 
   def print_line
     col_num = `tput cols`

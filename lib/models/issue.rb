@@ -9,7 +9,7 @@ module Models
       @summary = fields["summary"]
       @status = fields["status"]["name"]
       @reporter = fields["reporter"]["name"]
-      @assignee = fields["assignee"]["name"] if fields["assignee"]
+      @assignee = fields["assignee"] && fields["assignee"]["name"]
       @labels = fields["labels"]
       @description = fields["description"]
       @json_uri = json["self"]

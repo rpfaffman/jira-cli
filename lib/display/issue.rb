@@ -7,7 +7,7 @@ class Display
     end
 
     def print_abridged
-      print "#{issue.key.blue} #{issue.status.green} #{issue.summary}\n"
+      print "#{issue.key.blue} #{issue.status.green} #{issue.summary} #{issue.assignee && issue.assignee.brown}\n"
     end
 
     def print_standard

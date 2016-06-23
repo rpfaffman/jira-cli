@@ -5,7 +5,7 @@ require_relative './models/issue'
 
 class App
   # query using jql or flags
-  # TODO: allow query string and options. build query from options
+  # TODO: allow query string AND options. build query from options
   # and concatenate the two strings
   def query(query)
     query_method = query.is_a?(Hash) ? :options_query : :string_query

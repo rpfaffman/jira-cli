@@ -3,11 +3,18 @@ require_relative '../../lib/app.rb'
 describe App do
   let(:app) { App.new }
   let(:options) do { some_key: "some value" } end
-  let(:issues) { ['issue1', 'issue2'] }
+  let(:issues) { [issue1, issue2] }
+  let(:issues_json) { [issue1_json, issue2_json] }
+  let(:issue1) { double('issue1') }
+  let(:issue2) { double('issue2') }
+  let(:issue1_json) do { some: 'data for issue1' } end
+  let(:issue2_json) do { some: 'data for issue2' } end
 
   before do
+    allow(Models::Issue).to receive(:new).with(issue1_json) { issue1 }
+    allow(Models::Issue).to receive(:new).with(issue2_json) { issue2 }
     allow_any_instance_of(JiraClient)
-      .to receive(:options_query) { issues }
+      .to receive(:options_query) { issues_json }
     allow_any_instance_of(Display)
       .to receive(:print_issues) { true }
   end
@@ -19,14 +26,6 @@ describe App do
       app.query(options)
     end
 
-    describe "query is nil" do
-      it "should use the base query" do
-        expect_any_instance_of(JiraClient)
-          .to receive(:string_query).with(nil)
-        app.query(nil)
-      end
-    end
-
     describe "query arg is a hash" do
       it "should send the options to the client" do
         expect_any_instance_of(JiraClient)
@@ -36,11 +35,11 @@ describe App do
     end
 
     describe "query arg is a string" do
-      let(:query_string) { "string" }
+      let(:query_string) { 'additional query' }
 
       before do
         allow_any_instance_of(JiraClient)
-          .to receive(:query) { issues }
+          .to receive(:query) { issues_json }
       end
 
       it "should send the options to the client" do

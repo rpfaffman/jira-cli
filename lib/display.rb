@@ -21,7 +21,10 @@ class Display
     if (response.code === 204)
       puts "SUCCESS".green
     else
-      puts "ERROR(S): \n".red + "\t" + response["errorMessages"].red.join("\n\t")
+      puts "ERROR: #{response.code}".red
+      if response["errorMessages"]
+        puts "\t" + response["errorMessages"].to_s.red.join("\n\t")
+      end
     end
   end
 

@@ -37,16 +37,28 @@ class JiraClient
     )
   end
 
-  def open_issue(key=nil)
+  def open(key=nil)
     issue_key = key || git_branch
     system("open #{jira_uri}/browse/#{issue_key}")
+  end
+
+  def watch(key)
+    request(:post, "issue/#{key}/watchers", email)
+  end
+
+  def unwatch(key)
+    request(
+      :delete,
+      "issue/#{key}/watchers?username=#{email}"
+    )
   end
 
   private
 
   def request(method, path, data={})
     full_path = "#{base_uri}/#{path}"
-    api.public_send(method, full_path, headers: headers, body: data.to_json)
+    result = api.public_send(method, full_path, headers: headers, body: data.to_json)
+    result
   end
 
   def build_query(options)

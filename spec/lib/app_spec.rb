@@ -81,8 +81,56 @@ describe App do
 
     it "should open the issue with the client" do
       expect_any_instance_of(JiraClient)
-        .to receive(:open_issue).with(key)
+        .to receive(:open).with(key)
       app.open(key)
+    end
+  end
+
+  describe "#watch" do
+    let(:key) { 'AB-123'}
+    let(:response) { double('response') }
+
+    before do
+      allow_any_instance_of(JiraClient)
+        .to receive(:watch) { response } 
+      allow_any_instance_of(Display)
+        .to receive(:print_response) { true }
+    end
+
+    it "should issue a watch command to the client" do
+      expect_any_instance_of(JiraClient)
+        .to receive(:watch).with(key)
+      app.watch(key)
+    end
+
+    it "should print the response" do
+      expect_any_instance_of(Display)
+        .to receive(:print_response).with(response)
+      app.watch(key)
+    end
+  end
+
+  describe "#unwatch" do
+    let(:key) { 'AB-123'}
+    let(:response) { double('response') }
+
+    before do
+      allow_any_instance_of(JiraClient)
+        .to receive(:unwatch) { response }
+      allow_any_instance_of(Display)
+        .to receive(:print_response) { true }
+    end
+
+    it "should issue a unwatch command to the client" do
+      expect_any_instance_of(JiraClient)
+        .to receive(:unwatch).with(key)
+      app.unwatch(key)
+    end
+
+    it "should print the response" do
+      expect_any_instance_of(Display)
+        .to receive(:print_response).with(response)
+      app.unwatch(key)
     end
   end
 end

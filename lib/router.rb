@@ -22,7 +22,9 @@ class Router
     [
       "update",
       "transition",
-      "open"
+      "open",
+      "watch",
+      "unwatch"
     ]
   end
 end

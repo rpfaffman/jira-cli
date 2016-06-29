@@ -1,6 +1,6 @@
 require 'yaml'
-require_relative 'jira_client'
-require_relative 'display'
+require_relative './jira_client'
+require_relative './display'
 require_relative './models/issue'
 
 class App
@@ -21,7 +21,17 @@ class App
 
   # open ticket in browser
   def open(key, options={})
-    client.open_issue(key)
+    client.open(key)
+  end
+
+  def watch(key, options={})
+    response = client.watch(key)
+    display.print_response(response)
+  end
+
+  def unwatch(key, options={})
+    response = client.unwatch(key)
+    display.print_response(response)
   end
 
   private

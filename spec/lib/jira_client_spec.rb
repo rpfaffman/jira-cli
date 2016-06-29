@@ -113,15 +113,50 @@ describe JiraClient do
     end
   end
 
-  describe "#open_issue" do
+  describe "#open" do
     let(:issue_key) { 'AB-123' }
-    let(:git_branch_name) { 'XY-987' }
 
-    describe "issue_key is provided" do
-      it "should `open` the jira URI of the provided key" do
-        expect(client).to receive(:system).with("open #{jira_uri}/browse/#{issue_key}")
-        client.open_issue(issue_key)
-      end
+    it "should `open` the jira URI of the provided key" do
+      expect(client).to receive(:system).with("open #{jira_uri}/browse/#{issue_key}")
+      client.open(issue_key)
+    end
+  end
+
+  describe "#watch" do
+    let(:issue_key) { 'AB-123' }
+    let(:watch_path) { "#{jira_uri}/rest/api/2/issue/#{issue_key}/watchers" }
+    let(:expected_response) { 'successful response' }
+
+    before do
+      allow(api).to receive(:post).with(
+        watch_path,
+        headers: headers,
+        body: email.to_json
+      ) { expected_response }
+    end
+
+    it "should send a request to add the user as a watch" do
+      expect(client.watch(issue_key)).to eq(expected_response)
+      client.watch(issue_key)
+    end
+  end
+
+  describe "#unwatch" do
+    let(:issue_key) { 'AB-123' }
+    let(:watch_path) { "#{jira_uri}/rest/api/2/issue/#{issue_key}/watchers?username=#{email}" }
+    let(:expected_response) { 'successful response' }
+
+    before do
+      allow(api).to receive(:delete).with(
+        watch_path,
+        headers: headers,
+        body: {}.to_json
+      ) { expected_response }
+    end
+
+    it "should send a request to remove the user's email as a watcher" do
+      expect(client.unwatch(issue_key)).to eq(expected_response)
+      client.unwatch(issue_key)
     end
   end
 end
